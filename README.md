@@ -1,61 +1,191 @@
 # validate-data
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+Este projeto utiliza Quarkus
 
-If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
+https://quarkus.io/
 
-## Running the application in dev mode
+## Rodando sua aplicação em modo dev:
+mvn quarkus:dev
 
-You can run your application in dev mode that enables live coding using:
+
+> **_NOTA:_**   Dev UI em dev mode em http://localhost:8080/q/dev/.
+
+## Empacotano e rodando a aplicação
 ```shell script
-./mvnw compile quarkus:dev
+./mvn clean package
 ```
 
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at http://localhost:8080/q/dev/.
-
-## Packaging and running the application
-
-The application can be packaged using:
+## Criando un executável nativo
 ```shell script
-./mvnw package
-```
-It produces the `quarkus-run.jar` file in the `target/quarkus-app/` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/quarkus-app/lib/` directory.
-
-The application is now runnable using `java -jar target/quarkus-app/quarkus-run.jar`.
-
-If you want to build an _über-jar_, execute the following command:
-```shell script
-./mvnw package -Dquarkus.package.type=uber-jar
+mvn package -Pnative
 ```
 
-The application, packaged as an _über-jar_, is now runnable using `java -jar target/*-runner.jar`.
 
-## Creating a native executable
-
-You can create a native executable using: 
-```shell script
-./mvnw package -Pnative
-```
-
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using: 
+Se não possui GraalVM instalado, rode nativamente em um container usando: 
 ```shell script
 ./mvnw package -Pnative -Dquarkus.native.container-build=true
 ```
 
-You can then execute your native executable with: `./target/validate-data-1.0.0-runner`
+Rode o executável nativo executando `./target/validate-data-1.0.0-runner`
 
-If you want to learn more about building native executables, please consult https://quarkus.io/guides/maven-tooling.
 
-## Related Guides
 
-- Minikube ([guide](https://quarkus.io/guides/kubernetes)): Generate Minikube resources from annotations
-- Hibernate Validator ([guide](https://quarkus.io/guides/validation)): Validate object properties (field, getter) and method parameters for your beans (REST, CDI, Jakarta Persistence)
+PASSOS DE CONSTRUÇÃO DO PROJETO
+-----------------------------------------------------------------------------------
 
-## Provided Code
 
-### RESTEasy Reactive
+1 - INSTALAR JAVA / MAVEN / DOCKER / MINIKUBE / KUBECTL
+-----------------------------------------------------------------------------------
+sudo snap install kubectl --classic
 
-Easily start your Reactive RESTful Web Services
+2 - CRIAR CONTA  E REPOSÍTÓRIO NO DOCKER HUB
+-----------------------------------------------------------------------------------
+https://hub.docker.com
+Repositório validate-data
 
-[Related guide section...](https://quarkus.io/guides/getting-started-reactive#reactive-jax-rs-resources)
+
+3 - CRIAR PROJETO COM DEPÊNDÊNCIAS
+-----------------------------------------------------------------------------------
+
+quarkus-resteasy-reactive-jackson	* extensão para criação de endpoints rest
+quarkus-minikube			* versão simplificada do kubernetes para rodar em máquina local
+quarkus-container-image-jib   		* cria imagens sem necessidade de docker file
+quarkus-hibernate-validator		* extensão para validação
+
+
+4 - CONSTRUIR UM PROJETO COM PELO MENOS UM END POINT
+-----------------------------------------------------------------------------------
+.
+.
+.
+
+@Path("/product")
+public class ProductResource {
+@Inject
+Validator validator;
+
+    //OPÇÃO 1 DE VALIDAÇÃO 
+    @POST
+    public Result addProduct(@Valid Product product){
+        return  new Result("Produto inserido é válido");
+    }
+
+    //OPÇÃO 2 DE VALIDAÇÃO 
+    @POST
+    @Path("/without-validator")
+    public Result addProductNoValidation(Product product){
+        Set<ConstraintViolation<Product>> violations = validator.validate(product);
+
+        if(violations.isEmpty()){
+            return  new Result("Produto inserido é válido");
+        }else{
+         return new Result(violations);
+        }
+    }
+
+}
+
+5- RODAR/ TESTAR APLICAÇÃO QUARKUS LOCALMENTE
+mvn quarkus:dev
+
+
+
+6 - ADICIONAR CONFIGURAÇÕES NO ARQUIVO APPLICATION.PROPERTIES
+-----------------------------------------------------------------------------------
+quarkus.container-image.build=true
+quarkus.container-image.group=a<nome-do-usuário>docker-hub
+
+
+7 - CRIAR IMAGEM DA APLICAÇÃO
+-----------------------------------------------------------------------------------
+mvn clean package
+
+
+8 - ADICIONAR IMAGEM AO REPOSITÓRIO DO DOCKER HUB
+-----------------------------------------------------------------------------------
+login passando usuario e senha
+docker login
+
+listar imagem criada e identificar id
+docker images
+
+criar tag
+docker tag <id-da-imagem> aloisiop1/validate-data:1.0.0
+
+enviar imagem ao docke rhub
+docker push aloisiop1/validate-data:1.0.0
+
+endereço público:
+https://hub.docker.com/r/aloisiop1/validate-data/
+
+
+9 - CRIAR REPOSITÓRIO GIT (GITHUB/BITBUCKET/GITLAB/ETC)
+-----------------------------------------------------------------------------------
+https://github.com/aloisiop1/validate-data
+
+
+10 - ADICIONAR IMAGEM AO REPOSITÓRIO MINIKUBE
+-----------------------------------------------------------------------------------
+verificar status
+minikube status
+
+iniciar minikube se necessário
+minikube start
+
+ir para pasta kubernetes criada ao gerar a imagem do projeto
+cd ~/projetos/quarkus/validate-data/target/kubernetes
+
+rodar kubectl com os dados da imagem contidos no arquivo minikube.yml
+kubectl apply -f minikube.yml
+
+listar os serviços criados e obter o nome
+kubectl get services
+
+obter a url do  serviço criado (http://192.168.49.2:30525/)
+minikube service validate-data --url
+
+testar endpoint no postman ou usando curl
+curl --location 'http://192.168.49.2:30525/product' \
+--header 'Content-Type: application/json' \
+--data '{
+"label": "Samsung A73",    
+"description": "Smartphone Samsung A73 5G",
+"quantity": 1,
+"price":2200.0
+
+
+11 - CRIAR CONTA NO GOOGLE CLOUD OU OUTRO PROVEDOR DE NUVEM E CRIAR KLUSTER KUBERNETES
+-----------------------------------------------------------------------------------   
+https://cloud.google.com/
+
+a - logar e ativar teste gratuito (se conta for nova)
+b - criar um app conteinerizado (kubernetes engine)
+c - ativar kubernetes engine api
+d - criar cluster do kubernetes
+e - conectar via gshell:
+gcloud container clusters get-credentials validate-data --region us-central1 --project angelic-cat-390416
+f - clonar o repostório do git
+git clone git@github.com:aloisiop1/validate-data.git
+g - ir para o diretório estão as confiogurações do kubernters
+cd ~/validate-data/target/kubernetes
+h - dar o apply do projeto via kubectl
+kubectl apply -f kubernetes.yml
+i - listar pods serviços e deployments
+kubectl get pods
+kubectl get services
+kubectl get deployments
+j - expor o serviço, pois até o momento apenas um ip interno está disponível (10.126.0.70 por exemplo)    
+kubectl expose deployment validate-data --type=LoadBalancer --name validate-data-exposed
+
+k - listar o serviço e verificar qual ip externo foi disponibilizado. o resultado é algo  mais o menos assim
+validate-data-exposed   LoadBalancer   10.126.0.78    34.72.33.251   8080:31216/TCP,8443:30803/TCP   46s
+l - testar um endpoint com o ip externo do serviço do kubernetes no google cloud:
+curl --location 'http://34.72.33.251:8080/product' \
+--header 'Content-Type: application/json' \
+--data '{
+"label": "Samsung A73",    
+"description": "Smartphone Samsung A73",
+"quantity": 1,
+"price": -1.0
+}'    
+m - não se esquecer de depois de testar, remover cluster para evitar ser tarifado pelo google
