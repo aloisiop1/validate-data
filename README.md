@@ -10,7 +10,7 @@ mvn quarkus:dev
 
 > **_NOTA:_**   Dev UI em dev mode em http://localhost:8080/q/dev/.
 
-## Empacotano e rodando a aplicação
+## Empacotando e rodando a aplicação
 ```shell script
 ./mvn clean package
 ```
@@ -44,7 +44,7 @@ https://hub.docker.com
 Repositório validate-data
 
 
-3 - CRIAR PROJETO COM DEPÊNDÊNCIAS
+3 - CRIAR PROJETO COM DEPENDÊNCIAS
 -----------------------------------------------------------------------------------
 
 quarkus-resteasy-reactive-jackson	* extensão para criação de endpoints rest
@@ -53,7 +53,7 @@ quarkus-container-image-jib   		* cria imagens sem necessidade de docker file
 quarkus-hibernate-validator		* extensão para validação
 
 
-4 - CONSTRUIR UM PROJETO COM PELO MENOS UM END POINT
+4 - CONSTRUIR UM PROJETO COM PELO MENOS UM ENDPOINT
 -----------------------------------------------------------------------------------
 .
 .
