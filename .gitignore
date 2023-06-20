@@ -1,6 +1,6 @@
 #Maven
 target/*
-target/kubernetes
+!target/kubernetes/
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
