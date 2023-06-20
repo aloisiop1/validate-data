@@ -154,7 +154,7 @@ curl --location 'http://192.168.49.2:30525/product' \
 "price":2200.0
 
 
-11 - CRIAR CONTA NO GOOGLE CLOUD OU OUTRO PROVEDOR DE NUVEM E CRIAR KLUSTER KUBERNETES
+11 - CRIAR CONTA NO GOOGLE CLOUD OU OUTRO PROVEDOR DE NUVEM E CRIAR CLUSTER KUBERNETES
 -----------------------------------------------------------------------------------   
 https://cloud.google.com/
 
