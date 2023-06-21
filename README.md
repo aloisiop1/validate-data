@@ -85,9 +85,9 @@ Validator validator;
 
 }
 
-5- RODAR/ TESTAR APLICAÇÃO QUARKUS LOCALMENTE
+5 - RODAR/TESTAR APLCAIÇÃO QUARKUS LOCALMENTE
+-----------------------------------------------------------------------------------
 mvn quarkus:dev
-
 
 
 6 - ADICIONAR CONFIGURAÇÕES NO ARQUIVO APPLICATION.PROPERTIES
